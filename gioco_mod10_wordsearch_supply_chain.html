@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>MOD10 – Cerca le Parole: Supply Chain</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+body{background:linear-gradient(135deg,#4e342e,#6d4c41,#795548);min-height:100vh;overflow:hidden;display:flex;justify-content:center;align-items:center}
+.container{width:800px;height:550px;background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5);overflow:hidden;display:flex;flex-direction:column}
+.header{background:linear-gradient(135deg,#4e342e,#6d4c41);color:#fff;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.header h1{font-size:15px;font-weight:700}.header p{font-size:11px;opacity:.8;margin-top:1px}
+button{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;font-family:inherit}
+.btn-white{background:#fff;color:#4e342e}.btn-white:hover{background:#efebe9}
+.btn-outline{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)}.btn-outline:hover{background:rgba(255,255,255,.25)}
+.btn-group{display:flex;gap:8px}
+.hidden{display:none!important}
+.page{flex:1;display:flex;flex-direction:column;min-height:0}
+
+/* Intro */
+.instr{padding:18px 26px;overflow-y:auto;flex:1}
+.instr h2{font-size:22px;color:#4e342e;margin-bottom:10px}
+.instr p{font-size:13px;line-height:1.6;color:#444;margin-bottom:8px}
+.how-grid{display:flex;gap:10px;margin:14px 0}
+.how-step{flex:1;background:#efebe9;border-radius:8px;padding:10px;text-align:center;font-size:12px;color:#4e342e;font-weight:600;line-height:1.5}
+.how-step .num{font-size:22px;display:block;margin-bottom:4px}
+.start-btn{background:linear-gradient(135deg,#4e342e,#6d4c41);color:#fff;padding:11px 32px;font-size:14px;border-radius:8px;display:block;margin:16px auto 0;cursor:pointer;border:none;font-weight:600}
+.start-btn:hover{transform:translateY(-2px)}
+
+/* Game */
+.status-bar{display:flex;align-items:center;gap:16px;padding:6px 14px;background:#f5f5f5;border-bottom:1px solid #e0e0e0;flex-shrink:0;font-size:12px;color:#555}
+.found-badge{background:#4e342e;color:#fff;border-radius:20px;padding:2px 12px;font-size:12px;font-weight:700}
+.end-btn{margin-left:auto;background:#fff;color:#4e342e;border:1px solid #a1887f;padding:4px 10px;font-size:11px;border-radius:6px;cursor:pointer;font-weight:600}
+.game-area{flex:1;display:flex;gap:0;overflow:hidden;min-height:0;position:relative}
+.grid-wrap{flex:1.4;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.grid-table{border-collapse:collapse;user-select:none}
+.grid-table td{width:26px;height:26px;text-align:center;vertical-align:middle;font-size:13px;font-weight:700;color:#333;cursor:pointer;border-radius:3px;transition:background .1s}
+.grid-table td:hover{background:#efebe9}
+.grid-table td.selecting{background:#bcaaa4;color:#fff}
+.grid-table td.found-0{background:#4e342e;color:#fff}
+.grid-table td.found-1{background:#5d4037;color:#fff}
+.grid-table td.found-2{background:#6d4c41;color:#fff}
+.grid-table td.found-3{background:#795548;color:#fff}
+.grid-table td.found-4{background:#8d6e63;color:#fff}
+.word-panel{width:210px;flex-shrink:0;padding:10px 12px;border-left:1px solid #e0e0e0;background:#fafafa;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+.word-panel h2{font-size:12px;font-weight:700;color:#4e342e;flex-shrink:0}
+.word-list{display:flex;flex-direction:column;gap:3px;flex:1}
+.word-item{background:#fff;border:2px solid #d7ccc8;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:700;color:#555;transition:all .3s;display:flex;align-items:center;gap:5px}
+.word-item.found-word{border-color:#4e342e;background:#efebe9;color:#4e342e;text-decoration:line-through;opacity:.7}
+.hint-box{background:#efebe9;border-left:3px solid #6d4c41;border-radius:5px;padding:6px 8px;font-size:10px;color:#4e342e;line-height:1.5;flex-shrink:0}
+
+/* Result */
+.result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#4e342e,#6d4c41)}
+.result h2{color:#fff;font-size:24px;font-weight:700}
+.result .emoji{font-size:54px}
+.result p{color:#d7ccc8;font-size:13px;text-align:center;max-width:420px;line-height:1.6}
+.result-stats{display:flex;gap:10px}
+.result-stat{background:rgba(255,255,255,.15);border-radius:8px;padding:8px 18px;color:#fff;font-size:14px;font-weight:700;text-align:center}
+.result-stat span{display:block;font-size:10px;opacity:.8;margin-bottom:2px}
+.btn-again{background:#fff;color:#4e342e;padding:9px 26px;font-size:13px;border-radius:8px;font-weight:700;margin-top:4px;cursor:pointer;border:none}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div><h1>🔍 Cerca le Parole – Compromissione della Supply Chain</h1><p>Modulo 10 – Compromissione della supply chain</p></div>
+    <div class="btn-group">
+      <button class="btn-outline" onclick="resetGame()">🔄 Rigioca</button>
+      <button class="btn-white" onclick="window.close()">Torna al corso</button>
+    </div>
+  </div>
+
+  <div id="instrPage" class="page">
+    <div class="instr">
+      <h2>Il rischio non arriva sempre da dentro</h2>
+      <p>Un attacco alla supply chain colpisce un'azienda passando da un fornitore, un aggiornamento software o un componente di terze parti di cui ti fidi. I termini che userai in questo gioco sono quelli con cui riconoscerai e discuterai questo tipo di rischio.</p>
+      <p>Trova le 10 parole nascoste nella griglia: in orizzontale, verticale o diagonale, in entrambe le direzioni.</p>
+      <div class="how-grid">
+        <div class="how-step"><span class="num">🔤</span>Leggi le parole da trovare nel pannello a destra</div>
+        <div class="how-step"><span class="num">🖱️</span>Clicca sulla prima lettera e trascina fino all'ultima</div>
+        <div class="how-step"><span class="num">✅</span>La parola trovata viene evidenziata e barrata</div>
+      </div>
+      <button class="start-btn" onclick="startGame()">▶ Inizia</button>
+    </div>
+  </div>
+
+  <div id="gamePage" class="page hidden">
+    <div class="status-bar">
+      <span class="found-badge">Trovate: <span id="foundCount">0</span>/10</span>
+      <span style="font-size:11px;color:#888">Clicca sulla prima lettera e trascina fino all'ultima</span>
+      <button class="end-btn" onclick="endGame()">🏁 Termina</button>
+    </div>
+    <div class="game-area">
+      <div class="grid-wrap"><table class="grid-table" id="gridTable"></table></div>
+      <div class="word-panel">
+        <h2>🔍 Parole da trovare</h2>
+        <div class="word-list" id="wordList"></div>
+        <div class="hint-box">💡 Orizzontali, verticali o diagonali — in entrambe le direzioni.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultPage" class="page hidden">
+    <div class="result">
+      <div class="emoji" id="resEmoji">🏆</div>
+      <h2 id="resTitle">Ottimo lavoro!</h2>
+      <p id="resText">Hai trovato le parole chiave della supply chain.</p>
+      <div class="result-stats">
+        <div class="result-stat"><span>Trovate</span><span id="resFound">0/10</span></div>
+      </div>
+      <button class="btn-again" onclick="resetGame()">🔄 Rigioca</button>
+    </div>
+  </div>
+</div>
+<script>
+const WORDS=[
+  {word:'FORNITORE',icon:'🏭'},
+  {word:'TERZI',icon:'🤝'},
+  {word:'AGGIORNAMENTO',icon:'🔄'},
+  {word:'BACKDOOR',icon:'🚪'},
+  {word:'VULNERABILITA',icon:'⚠️'},
+  {word:'DIPENDENZA',icon:'🔗'},
+  {word:'AUDIT',icon:'🔍'},
+  {word:'PATCH',icon:'🩹'},
+  {word:'CERTIFICAZIONE',icon:'📜'},
+  {word:'TRACCIABILITA',icon:'📋'},
+];
+const SIZE=15;
+let grid=[],placedWords=[],foundWords=[],selecting=false,startCell=null,currentCells=[];
+
+function startGame(){
+  document.getElementById('instrPage').classList.add('hidden');
+  document.getElementById('gamePage').classList.remove('hidden');
+  initGame();
+}
+function initGame(){
+  foundWords=[];
+  document.getElementById('foundCount').textContent='0';
+  buildGrid();renderGrid();renderWords();
+}
+function buildGrid(){
+  grid=Array.from({length:SIZE},()=>Array(SIZE).fill(''));placedWords=[];
+  const dirs=[[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]];
+  for(const {word} of WORDS){
+    let ok=false;
+    for(let att=0;att<300&&!ok;att++){
+      const dir=dirs[Math.floor(Math.random()*dirs.length)];
+      const r=Math.floor(Math.random()*SIZE),c=Math.floor(Math.random()*SIZE);
+      const cells=[];let valid=true;
+      for(let i=0;i<word.length;i++){
+        const nr=r+dir[0]*i,nc=c+dir[1]*i;
+        if(nr<0||nr>=SIZE||nc<0||nc>=SIZE){valid=false;break;}
+        if(grid[nr][nc]!==''&&grid[nr][nc]!==word[i]){valid=false;break;}
+        cells.push([nr,nc]);
+      }
+      if(valid){cells.forEach(([nr,nc],i)=>grid[nr][nc]=word[i]);placedWords.push({word,cells});ok=true;}
+    }
+  }
+  const L='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++)if(!grid[r][c])grid[r][c]=L[Math.floor(Math.random()*26)];
+}
+function renderGrid(){
+  const table=document.getElementById('gridTable');table.innerHTML='';
+  for(let r=0;r<SIZE;r++){
+    const tr=document.createElement('tr');
+    for(let c=0;c<SIZE;c++){
+      const td=document.createElement('td');
+      td.textContent=grid[r][c];td.dataset.r=r;td.dataset.c=c;
+      td.addEventListener('mousedown',onDown);
+      td.addEventListener('mouseenter',onEnter);
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+  document.addEventListener('mouseup',onUp);
+}
+function renderWords(){
+  const list=document.getElementById('wordList');list.innerHTML='';
+  WORDS.forEach(({word,icon})=>{
+    const d=document.createElement('div');
+    d.className='word-item'+(foundWords.includes(word)?' found-word':'');
+    d.id='wi-'+word;
+    d.innerHTML=`<span>${icon}</span><span>${word}</span>`;
+    list.appendChild(d);
+  });
+}
+function getCell(r,c){return document.querySelector(`td[data-r="${r}"][data-c="${c}"]`);}
+function onDown(e){selecting=true;startCell={r:+e.target.dataset.r,c:+e.target.dataset.c};currentCells=[{...startCell}];clearSel();e.target.classList.add('selecting');e.preventDefault();}
+function onEnter(e){
+  if(!selecting||!startCell)return;
+  const r=+e.target.dataset.r,c=+e.target.dataset.c;
+  const dr=r-startCell.r,dc=c-startCell.c;
+  const len=Math.max(Math.abs(dr),Math.abs(dc));
+  if(len===0)return;
+  if(Math.abs(dr)!==Math.abs(dc)&&dr!==0&&dc!==0)return;
+  const sr=dr===0?0:dr/Math.abs(dr),sc=dc===0?0:dc/Math.abs(dc);
+  clearSel();currentCells=[];
+  for(let i=0;i<=len;i++){
+    const nr=startCell.r+sr*i,nc=startCell.c+sc*i;
+    currentCells.push({r:nr,c:nc});
+    const cell=getCell(nr,nc);
+    if(cell&&!cell.className.includes('found-'))cell.classList.add('selecting');
+  }
+}
+function onUp(){
+  if(!selecting)return;selecting=false;
+  const cellKey=c=>`${c.r},${c.c}`;
+  const selKey=currentCells.map(cellKey).join('|');
+  let matched=null;
+  for(const pw of placedWords){
+    if(foundWords.includes(pw.word))continue;
+    const fwd=pw.cells.map(([r,c])=>cellKey({r,c})).join('|');
+    const rev=pw.cells.map(([r,c])=>cellKey({r,c})).reverse().join('|');
+    if(selKey===fwd||selKey===rev){matched=pw;break;}
+  }
+  if(matched){
+    foundWords.push(matched.word);
+    document.getElementById('foundCount').textContent=foundWords.length;
+    const colorClass='found-'+(foundWords.length%5);
+    currentCells.forEach(({r,c})=>{const cell=getCell(r,c);if(cell){cell.classList.remove('selecting');cell.classList.add(colorClass);}});
+    document.getElementById('wi-'+matched.word)?.classList.add('found-word');
+    if(foundWords.length===WORDS.length)setTimeout(endGame,400);
+  }else{
+    clearSel();
+  }
+  currentCells=[];startCell=null;
+}
+function clearSel(){document.querySelectorAll('.selecting').forEach(el=>el.classList.remove('selecting'));}
+function endGame(){
+  const pct=foundWords.length/WORDS.length;
+  document.getElementById('resFound').textContent=foundWords.length+'/'+WORDS.length;
+  const emojiEl=document.getElementById('resEmoji'),titleEl=document.getElementById('resTitle'),textEl=document.getElementById('resText');
+  if(pct>=0.8){
+    emojiEl.textContent='🏆';titleEl.textContent=pct===1?'Tutte le parole trovate!':'Ottimo lavoro!';
+    textEl.textContent="Fornitore, aggiornamento, vulnerabilità, tracciabilità: questi termini descrivono dove nasce davvero il rischio di supply chain, spesso fuori dal perimetro diretto della tua azienda.";
+  }else if(pct>=0.5){
+    emojiEl.textContent='👍';titleEl.textContent='Buon lavoro';
+    textEl.textContent="Hai trovato più della metà dei termini chiave. Rigioca per completare il quadro del rischio legato a fornitori e componenti di terze parti.";
+  }else{
+    emojiEl.textContent='💪';titleEl.textContent='Riprova';
+    textEl.textContent="Rigioca con calma: la griglia resta la stessa struttura, cambia solo la disposizione delle parole.";
+  }
+  document.getElementById('gamePage').classList.add('hidden');
+  document.getElementById('resultPage').classList.remove('hidden');
+}
+function resetGame(){
+  document.getElementById('resultPage').classList.add('hidden');
+  document.getElementById('gamePage').classList.add('hidden');
+  document.getElementById('instrPage').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
